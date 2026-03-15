@@ -3,263 +3,875 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Name | .NET Developer</title>
-
+<title>Ali Yehia — Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #00ff88;
+    --accent2: #0088ff;
+    --text: #f0f0f0;
+    --muted: #666;
+    --card: #141414;
+  }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, Helvetica, sans-serif;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body{
-background:#0f172a;
-color:white;
-line-height:1.6;
-}
+  html { scroll-behavior: smooth; }
 
-/* NAVBAR */
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
 
-nav{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 10%;
-background:#020617;
-position:sticky;
-top:0;
-}
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: top 0.08s, left 0.08s, transform 0.2s ease;
+    opacity: 0.5;
+  }
 
-nav h2{
-color:#38bdf8;
-}
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9997;
+    opacity: 0.3;
+  }
 
-nav ul{
-display:flex;
-gap:20px;
-list-style:none;
-}
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    z-index: 100;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.9);
+    border-color: var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
 
-nav a{
-text-decoration:none;
-color:white;
-font-weight:500;
-}
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
 
-/* HERO */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(60px); }
+  }
 
-.hero{
-height:90vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
-}
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
 
-.hero h1{
-font-size:48px;
-margin-bottom:10px;
-}
+  .hero-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(56px, 10vw, 120px);
+    line-height: 0.9;
+    letter-spacing: -3px;
+    color: var(--text);
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+    position: relative;
+  }
+  .hero-name span {
+    color: var(--accent);
+    position: relative;
+  }
+  .hero-name span::after {
+    content: '';
+    position: absolute;
+    bottom: 4px; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    animation: lineIn 0.6s 1.2s forwards;
+  }
+  @keyframes lineIn { to { transform: scaleX(1); } }
 
-.hero span{
-color:#38bdf8;
-}
+  .hero-sub {
+    margin-top: 32px;
+    font-size: 15px;
+    color: var(--muted);
+    max-width: 480px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+    line-height: 1.8;
+  }
 
-.hero p{
-max-width:600px;
-margin-top:10px;
-color:#cbd5f5;
-}
+  .hero-cta {
+    margin-top: 48px;
+    display: flex;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn {
+    padding: 14px 32px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: transparent;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: -1;
+  }
+  .btn:hover { color: var(--bg); }
+  .btn:hover::before { transform: translateX(0); }
+  .btn.ghost {
+    border-color: var(--border);
+    color: var(--muted);
+  }
+  .btn.ghost::before { background: var(--border); }
+  .btn.ghost:hover { color: var(--text); }
 
-/* SECTIONS */
+  .hero-scroll {
+    position: absolute;
+    right: 48px;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeUp 0.8s 1s forwards;
+  }
+  .hero-scroll span {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
 
-section{
-padding:80px 10%;
-}
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-.section-title{
-font-size:32px;
-margin-bottom:40px;
-color:#38bdf8;
-}
+  /* SECTIONS */
+  section {
+    padding: 120px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
-/* SKILLS */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 80px;
+  }
 
-.skills{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:20px;
-}
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(32px, 5vw, 56px);
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 64px;
+    color: var(--text);
+  }
 
-.skill{
-background:#1e293b;
-padding:20px;
-text-align:center;
-border-radius:10px;
-}
+  /* ABOUT */
+  #about .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .about-text p {
+    color: #aaa;
+    line-height: 2;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .about-text p strong { color: var(--accent); font-weight: 400; }
 
-/* PROJECTS */
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .stat-card {
+    border: 1px solid var(--border);
+    padding: 28px 24px;
+    background: var(--card);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.3s;
+    transform-origin: bottom;
+  }
+  .stat-card:hover { border-color: var(--accent); }
+  .stat-card:hover::before { transform: scaleY(1); }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
 
-.projects{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:30px;
-}
+  /* SKILLS */
+  #skills .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+  }
+  .skill-group {
+    background: var(--card);
+    padding: 36px 32px;
+    transition: background 0.3s;
+  }
+  .skill-group:hover { background: var(--surface); }
+  .skill-group-title {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+  .tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,255,136,0.05);
+  }
 
-.project-card{
-background:#1e293b;
-padding:25px;
-border-radius:10px;
-transition:0.3s;
-}
+  /* EXPERIENCE */
+  #experience .exp-item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 48px;
+    padding: 48px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  #experience .exp-item:first-of-type { border-top: 1px solid var(--border); }
+  .exp-date {
+    font-size: 12px;
+    color: var(--muted);
+    padding-top: 4px;
+    letter-spacing: 0.05em;
+  }
+  .exp-role {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .exp-company {
+    color: var(--accent);
+    font-size: 12px;
+    margin-top: 4px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .exp-bullets {
+    list-style: none;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .exp-bullets li {
+    color: #aaa;
+    font-size: 13px;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.7;
+  }
+  .exp-bullets li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+  }
 
-.project-card:hover{
-transform:translateY(-5px);
-}
+  /* PROJECTS */
+  #projects .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    background: var(--border);
+  }
+  .project-card {
+    background: var(--card);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+    group: true;
+  }
+  .project-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    transform-origin: left;
+  }
+  .project-card:hover { background: var(--surface); }
+  .project-card:hover::after { transform: scaleX(1); }
+  .project-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 72px;
+    font-weight: 800;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 32px;
+    transition: color 0.3s;
+  }
+  .project-card:hover .project-num { color: rgba(0,255,136,0.1); }
+  .project-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+  .project-desc {
+    color: #888;
+    font-size: 12px;
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stack-tag {
+    font-size: 10px;
+    padding: 4px 10px;
+    background: rgba(0,255,136,0.08);
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
 
-.project-card h3{
-margin-bottom:10px;
-color:#38bdf8;
-}
+  /* CONTACT */
+  #contact {
+    padding-bottom: 160px;
+  }
+  #contact .contact-inner {
+    border: 1px solid var(--border);
+    padding: 80px;
+    background: var(--card);
+    position: relative;
+    overflow: hidden;
+  }
+  #contact .contact-inner::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .contact-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 64px;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+  .contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .contact-link {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: color 0.2s;
+  }
+  .contact-link::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.3s;
+  }
+  .contact-link:hover { color: var(--accent); }
+  .contact-link:hover::before { width: 40px; }
 
-/* CONTACT */
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+  footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+  footer a:hover { color: var(--accent); }
 
-.contact{
-text-align:center;
-}
+  /* REVEAL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
 
-.contact a{
-color:#38bdf8;
-text-decoration:none;
-}
+  /* Accent line decoration */
+  .accent-line {
+    display: inline-block;
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+    vertical-align: middle;
+    margin-right: 12px;
+  }
 
-/* FOOTER */
-
-footer{
-text-align:center;
-padding:20px;
-background:#020617;
-margin-top:40px;
-}
-
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    section { padding: 80px 24px; }
+    #hero { padding: 0 24px 60px; }
+    #about .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    #skills .skills-grid { grid-template-columns: 1fr; }
+    #experience .exp-item { grid-template-columns: 1fr; gap: 16px; }
+    #projects .projects-grid { grid-template-columns: 1fr; }
+    #contact .contact-inner { padding: 48px 32px; }
+    .contact-top { flex-direction: column; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
 </style>
 </head>
-
 <body>
 
-<nav>
-<h2>Ali Yehia</h2>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
 
-<ul>
-<li><a href="#about">About</a></li>
-<li><a href="#skills">Skills</a></li>
-<li><a href="#projects">Projects</a></li>
-<li><a href="#contact">Contact</a></li>
-</ul>
-
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">AY.</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
 </nav>
 
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-tag">// Full-Stack .NET Developer · Cairo, Egypt</div>
+  <h1 class="hero-name">ALI<br><span>YEHIA</span></h1>
+  <p class="hero-sub">Computer Science student at Ain Shams University. Building structured, scalable applications with .NET — one clean commit at a time.</p>
+  <div class="hero-cta">
+    <a href="#projects" class="btn">View Work</a>
+    <a href="#contact" class="btn ghost">Get In Touch</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</div>
 
-<section class="hero">
-
-<h1>Hello, I'm <span>Ali Yehia</span></h1>
-
-<p>
-Computer Science student and aspiring Full-Stack .NET Developer.
-Currently learning modern web development and building projects
-using C#, ASP.NET, and SQL.
-</p>
-
-</section>
-
-
+<!-- ABOUT -->
 <section id="about">
-
-<h2 class="section-title">About Me</h2>
-
-<p>
-I am a Computer Science student at Ain Shams University and currently
-training as a Full-Stack .NET developer through the DEPI program.
-I enjoy building structured and efficient software and continuously
-improving my programming skills by working on real projects.
-</p>
-
+  <div class="section-label">01 — About</div>
+  <h2 class="section-title reveal">Who I Am</h2>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <p>I'm a <strong>Computer Science student</strong> at Ain Shams University (graduating 2027) and a Full-Stack .NET trainee at the <strong>Digital Egypt Pioneers Initiative (DEPI)</strong>.</p>
+      <p>I focus on building clean, well-structured applications using object-oriented principles. Whether it's designing RESTful APIs, managing SQL databases, or implementing data structures — I care about writing code that's readable and maintainable.</p>
+      <p>I'm continuously sharpening my problem-solving skills and believe in <strong>learning by building</strong>.</p>
+    </div>
+    <div class="about-stats reveal reveal-delay-2">
+      <div class="stat-card">
+        <div class="stat-num">2027</div>
+        <div class="stat-label">Expected Graduation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Languages Mastered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Projects Shipped</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Lines to Write</div>
+      </div>
+    </div>
+  </div>
 </section>
 
-
+<!-- SKILLS -->
 <section id="skills">
-
-<h2 class="section-title">Skills</h2>
-
-<div class="skills">
-
-<div class="skill">C#</div>
-<div class="skill">.NET</div>
-<div class="skill">ASP.NET</div>
-<div class="skill">C++</div>
-<div class="skill">Java</div>
-<div class="skill">SQL</div>
-<div class="skill">OOP</div>
-<div class="skill">Git & GitHub</div>
-
-</div>
-
+  <div class="section-label">02 — Skills</div>
+  <h2 class="section-title reveal">My Stack</h2>
+  <div class="skills-grid reveal">
+    <div class="skill-group">
+      <div class="skill-group-title">Languages</div>
+      <div class="skill-tags">
+        <span class="tag">C#</span>
+        <span class="tag">C++</span>
+        <span class="tag">Java</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Frameworks</div>
+      <div class="skill-tags">
+        <span class="tag">.NET</span>
+        <span class="tag">ASP.NET Core</span>
+        <span class="tag">RESTful APIs</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Database & Tools</div>
+      <div class="skill-tags">
+        <span class="tag">SQL Server</span>
+        <span class="tag">Git</span>
+        <span class="tag">GitHub</span>
+        <span class="tag">Visual Studio</span>
+        <span class="tag">VS Code</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Concepts</div>
+      <div class="skill-tags">
+        <span class="tag">OOP</span>
+        <span class="tag">Data Structures</span>
+        <span class="tag">Clean Code</span>
+        <span class="tag">Clean Architecture</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Soft Skills</div>
+      <div class="skill-tags">
+        <span class="tag">Problem Solving</span>
+        <span class="tag">Analytical Thinking</span>
+        <span class="tag">Team Work</span>
+        <span class="tag">Continuous Learning</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Currently Learning</div>
+      <div class="skill-tags">
+        <span class="tag">Full-Stack Web Dev</span>
+        <span class="tag">Backend APIs</span>
+        <span class="tag">System Design</span>
+      </div>
+    </div>
+  </div>
 </section>
 
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">03 — Experience</div>
+  <h2 class="section-title reveal">Where I've Worked</h2>
 
+  <div class="exp-item reveal">
+    <div class="exp-date">2025 — Present</div>
+    <div>
+      <div class="exp-role">Full-Stack .NET Trainee</div>
+      <div class="exp-company">Digital Egypt Pioneers Initiative (DEPI)</div>
+      <ul class="exp-bullets">
+        <li>Developing web applications using ASP.NET Core and .NET technologies</li>
+        <li>Designing and implementing RESTful APIs with clean architecture</li>
+        <li>Working with SQL Server for database design and management</li>
+        <li>Applying object-oriented programming and clean code principles</li>
+        <li>Using Git and GitHub for version control and collaboration</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exp-item reveal reveal-delay-1">
+    <div class="exp-date">2023 — Present</div>
+    <div>
+      <div class="exp-role">B.Sc. Computer Science</div>
+      <div class="exp-company">Ain Shams University</div>
+      <ul class="exp-bullets">
+        <li>Studying core CS fundamentals: algorithms, data structures, OOP, software engineering</li>
+        <li>Building hands-on projects in C++, C#, and Java</li>
+        <li>Expected graduation: 2027</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
 <section id="projects">
-
-<h2 class="section-title">Projects</h2>
-
-<div class="projects">
-
-<div class="project-card">
-<h3>Real Estate System</h3>
-<p>
-A property management system built as a programming project.
-Used map and queue data structures to organize property listings
-and manage client requests efficiently.
-</p>
-</div>
-
-<div class="project-card">
-<h3>ASP.NET Web App</h3>
-<p>
-A web application developed using ASP.NET and SQL database,
-demonstrating backend logic, database integration, and web UI.
-</p>
-</div>
-
-</div>
-
+  <div class="section-label">04 — Projects</div>
+  <h2 class="section-title reveal">What I've Built</h2>
+  <div class="projects-grid reveal">
+    <div class="project-card">
+      <div class="project-num">01</div>
+      <div class="project-title">Real Estate Management System</div>
+      <p class="project-desc">A property management system built as a data structures project. Implements efficient property storage and retrieval using maps, and manages customer requests in FIFO order with queues — all structured around OOP principles.</p>
+      <div class="project-stack">
+        <span class="stack-tag">C++</span>
+        <span class="stack-tag">Data Structures</span>
+        <span class="stack-tag">OOP</span>
+        <span class="stack-tag">Map</span>
+        <span class="stack-tag">Queue</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-num">02</div>
+      <div class="project-title">Web Applications with ASP.NET Core</div>
+      <p class="project-desc">Full-stack web applications built during the DEPI training program. Focuses on implementing database connectivity, backend logic, and practicing clean architecture with structured project design.</p>
+      <div class="project-stack">
+        <span class="stack-tag">ASP.NET Core</span>
+        <span class="stack-tag">.NET</span>
+        <span class="stack-tag">SQL Server</span>
+        <span class="stack-tag">REST API</span>
+        <span class="stack-tag">Clean Arch</span>
+      </div>
+    </div>
+  </div>
 </section>
 
-
+<!-- CONTACT -->
 <section id="contact">
-
-<h2 class="section-title">Contact</h2>
-
-<div class="contact">
-
-<p>Email: ayehaialia@gmail.com</p>
-<p>LinkedIn: linkedin.com/in/ayehia8</p>
-<p>GitHub: github.com/ali-yehia</p>
-
-</div>
-
+  <div class="section-label">05 — Contact</div>
+  <div class="contact-inner reveal">
+    <div class="contact-top">
+      <div>
+        <h2 class="section-title" style="margin-bottom:16px">Let's Build<br>Something.</h2>
+        <p style="color:#888; font-size:13px; max-width:400px; line-height:1.8;">Open to internships, collaborations, and interesting projects. Drop me a message and I'll get back to you.</p>
+      </div>
+      <div class="contact-links">
+        <a href="mailto:ayehaialial@gmail.com" class="contact-link">ayehaialial@gmail.com</a>
+        <a href="tel:+201110270681" class="contact-link">+20 111 027 0681</a>
+        <a href="https://github.com/ayehia8" target="_blank" class="contact-link">github.com/ayehia8</a>
+        <a href="https://linkedin.com/in/ali-yehai" target="_blank" class="contact-link">linkedin.com/in/ali-yehai</a>
+      </div>
+    </div>
+    <a href="mailto:ayehaialial@gmail.com" class="btn" style="display:inline-block">Send a Message →</a>
+  </div>
 </section>
-
 
 <footer>
-
-<p>© 2026 ali yehia</p>
-
+  <span>© 2025 Ali Yehia — Cairo, Egypt</span>
+  <span>Built with intention.</span>
 </footer>
 
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX - 6 + 'px';
+    cursor.style.top = e.clientY - 6 + 'px';
+    ring.style.left = e.clientX - 18 + 'px';
+    ring.style.top = e.clientY - 18 + 'px';
+  });
+  document.querySelectorAll('a, button, .tag, .stat-card, .project-card, .skill-group').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      ring.style.transform = 'scale(1.5)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      ring.style.transform = 'scale(1)';
+    });
+  });
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Animated counters
+  function animateCounter(el, target, duration = 1500) {
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start = Math.min(start + step, target);
+      el.textContent = Math.floor(start) + (target >= 2027 ? '' : '+');
+      if (start >= target) clearInterval(timer);
+    }, 16);
+  }
+  const statObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const nums = e.target.querySelectorAll('.stat-num');
+        nums.forEach(n => {
+          const val = n.textContent;
+          if (val === '∞' || val === '+') return;
+          const num = parseInt(val);
+          if (!isNaN(num)) animateCounter(n, num);
+        });
+        statObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.about-stats').forEach(el => statObserver.observe(el));
+</script>
 </body>
 </html>
-
